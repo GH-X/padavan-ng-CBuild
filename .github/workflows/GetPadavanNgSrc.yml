@@ -1,0 +1,77 @@
+name: GetPadavanNgSrc
+
+on:
+#  schedule:
+#    - cron: 0 20 * * 0
+  release:
+    types: [published]
+  watch:
+    types: [started]
+env:
+  src_git: https://gitlab.com/dm38/padavan-ng.git
+  src_url: https://gitlab.com/dm38/padavan-ng/-/archive/master/padavan-ng-master.tar.gz
+  src_tmp: /opt/rt-n56u
+  src_pkg: padavan-ng-master.tar.gz
+  src_branch: PadavanNgMaster
+  toolchain_tmp: /opt/rt-n56u/toolchain
+  mipsel_tmp: /opt/rt-n56u/toolchain/out
+  mipsel_tar: mipsel-linux-uclibc-ng.tar.xz
+jobs:
+  build:
+    name: Get Padavan-ng src
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+#    timeout-minutes: 120
+    steps:
+
+      - name: Prepare environment
+        if: ${{ github.event_name == 'release' && success() }}
+        run: |
+          sudo apt update
+          sudo apt install libtool-bin gperf python-docutils autopoint gettext help2man
+
+      - name: Clone src
+        if: ${{ github.event_name == 'release' && success() }}
+        run: |
+          git clone -b master ${src_git} ${src_tmp}
+
+      - name: Build toolchain
+        if: ${{ github.event_name == 'release' && success() }}
+        run: |
+          cd ${toolchain_tmp}
+          ./clean_sources.sh
+          ./build_toolchain.sh
+
+      - name: Compressed toolchain
+        if: ${{ github.event_name == 'release' && success() }}
+        run: |
+          cd ${mipsel_tmp}
+          tar -caf ${mipsel_tar} *
+
+      - name: Upload mipsel to Releases
+        if: ${{ github.event_name == 'release' && success() }}
+        uses: svenstaro/upload-release-action@2.2.0
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.mipsel_tmp }}/${{ env.mipsel_tar }}
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+
+      - uses: actions/checkout@v2
+      - name: Download src
+        run: |
+          curl -O ${src_url}
+          tar -xf ${src_pkg} -C ${GITHUB_WORKSPACE}
+
+      - name: Upload src
+        run: |
+          cd ${GITHUB_WORKSPACE}/padavan-ng-master
+          git init
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git checkout -b ${src_branch}
+          git add -A
+          git commit -m "$(date +"%Y.%m.%d")"
+          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git push -f origin ${src_branch}
