@@ -1,0 +1,91 @@
+name: PadavanNgCBuild
+
+on:
+  release:
+    types: [published]
+  watch:
+    types: [started]
+env:
+  images_dir: /opt/images
+  src_trunk: /opt/rt-n56u/trunk
+  src_tmp: /opt/rt-n56u
+  src_git: https://github.com/${{ github.repository }}.git
+  src_branch: PadavanNgMaster
+  cac_branch: ConfigAndCustom
+  cac_tmp: /opt/cac
+  cac_trunk: /opt/cac/trunk
+  cac_configs: /opt/cac/configs
+  mipsel_url: https://github.com/${{ github.repository }}/releases/download
+  mipsel_tar: mipsel-linux-uclibc-ng.tar.xz
+  mipsel_tmp: /opt/rt-n56u/toolchain/out
+# 工具链版本
+  mipsel_rev: Rev1
+# 编译机型
+  BNAME: newifi-mini
+jobs:
+  build:
+    name: Build firmware
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+    steps:
+
+      - name: Prepare environment
+        run: |
+          sudo apt update
+          sudo apt install libtool-bin gperf python-docutils autopoint gettext
+
+      - name: Clone src
+        run: |
+          git clone -b ${src_branch} ${src_git} ${src_tmp}
+          git clone -b ${cac_branch} ${src_git} ${cac_tmp}
+
+      - name: Config and Custom
+        run: |
+          cd ${src_trunk}
+          if [ -f ${cac_configs}/${BNAME}.config ]; then
+            cp -f ${cac_configs}/${BNAME}.config .config
+            cp -rf ${cac_trunk}/* ${src_trunk}
+            echo "使用自定义机型配置编译固件"
+          else
+            echo "没有找到自定义机型配置文件!请到ConfigAndCustom分支configs目录下添加${BNAME}.config"
+            exit 1
+          fi
+
+      - name: Download mipsel
+        run: |
+          mkdir -p ${mipsel_tmp}
+          curl -LO ${mipsel_url}/${mipsel_rev}/${mipsel_tar}
+          tar -xf ${mipsel_tar} -C ${mipsel_tmp}
+
+      - name: Start build
+        run: |
+          mkdir -p ${images_dir}
+          cd ${src_trunk}
+          ./clear_tree.sh
+          ./build_firmware.sh
+          cp -f images/*.trx ${images_dir}/${BNAME}_$(date +%Y%m%d).trx
+
+      - name: Create archive
+        if: ${{ github.event_name != 'release' && success() }}
+        run: |
+          ls -lh ${images_dir}
+          image_name=PadavanNG_${BNAME}
+          cd ${images_dir}; md5sum *.trx |tee md5sum.txt; 7z a -mx=9 ${image_name}.7z ./*
+          echo "image_name=${image_name}" >> $GITHUB_ENV
+
+      - name: Upload images to Artifact
+        if: ${{ github.event_name != 'release' && success() }}
+        uses: actions/upload-artifact@v2.2.1
+        with:
+          name: ${{ env.image_name }}
+          path: ${{ env.images_dir }}/*.7z
+
+      - name: Upload images to Releases
+        if: ${{ github.event_name == 'release' && success() }}
+        uses: svenstaro/upload-release-action@2.2.0
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.images_dir }}/*.trx
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
