@@ -12,7 +12,7 @@ SMBCFLAGS += -DMAX_DEBUG_LEVEL="-1"
 endif
 
 all: config_test
-	MAKEFLAGS="$(MAKE_FLAGS)" $(MAKE) -C $(SRC_NAME) basics
+	MAKEFLAGS="$(MAKE_FLAGS)" $(MAKE) -C $(SRC_NAME)
 	MAKEFLAGS="$(MAKE_FLAGS)" $(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
 
 config_test:
