@@ -210,7 +210,7 @@ function show_clients(){
 		}
 	}
 
-	var NDRow = "<tr><td colspan='5'><div class='alert alert-info'><#Nodata#></div></td></tr>";
+	var NDRow = "<tr><td colspan='8'><div class='alert alert-info'><#Nodata#></div></td></tr>";
 
 	if (table1.rows.length < 3)
 		$j("#Clients_table tbody").append(NDRow);
