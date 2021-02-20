@@ -425,8 +425,8 @@ function networkmap_update(s){
 <script>
 	if (sw_mode != "3") {
 		if (list_type != "1"){
-			$("col_hname").width = "35%";
-			$("col_unhname").width = "35%";
+			$("col_hname").colspan = "4";
+			$("col_unhname").colspan = "4";
 			$("col_block").innerHTML = "<#Block#>";
 			$("col_unblock").innerHTML = "<#unBlock#>";
 		}
