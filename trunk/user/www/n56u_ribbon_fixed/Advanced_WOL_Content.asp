@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#Web_Title#> - WoL></title>
+<title><#Web_Title#> - <#Wake_on_LAN#>></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
@@ -293,7 +293,7 @@ $j(document).ready(function() {
                 <div class="row-fluid">
                     <div class="span12">
                         <div class="box well grad_colour_dark_blue">
-                            <h2 class="box_head round_top"><#menu5_2#><#Wake_on_LAN#></h2>
+                            <h2 class="box_head round_top"><#menu5_2#> - <#Wake_on_LAN#></h2>
                             <div class="round_bottom">
                                 <div class="row-fluid">
                                     <div id="tabMenu" class="submenuBlock"></div>
