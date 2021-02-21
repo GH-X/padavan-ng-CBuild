@@ -210,7 +210,7 @@ function show_clients(){
 		}
 	}
 
-	var NDRow = "<tr><td colspan='8'><div class='alert alert-info'><#Nodata#></div></td></tr>";
+	var NDRow = "<tr><td colspan='5'><div class='alert alert-info'><#Nodata#></div></td></tr>";
 
 	if (table1.rows.length < 3)
 		$j("#Clients_table tbody").append(NDRow);
@@ -368,17 +368,18 @@ function networkmap_update(s){
 </form>
 
 <div id="unBlockedClients_table"></div>
+
 <table id="Clients_table" width="100%" align="center" cellpadding="1" class="table">
     <thead>
         <tr>
-            <th colspan="8" style="text-align: center;"><#ConnectedClient#></th>
+            <th colspan="5" style="text-align: center;"><#ConnectedClient#></th>
         </tr>
         <tr>
-            <th colspan="1" ><#Type#></th>
-            <th colspan="4" id="col_hname"><#Computer_Name#></th>
+            <th colspan="1"><#Type#></th>
+            <th id="col_hname" colspan="1"><#Computer_Name#></th>
             <th colspan="1"><#LAN_IP#></th>
             <th colspan="1"><#MAC_Address#></th>
-            <th colspan="1" id="col_block"></th>
+            <th id="col_block" colspan="1"></th>
         </tr>
     </thead>
     <tbody>
@@ -389,14 +390,14 @@ function networkmap_update(s){
 <table id="xClients_table" width="100%" align="center" class="table">
     <thead>
         <tr>
-            <th colspan="8" style="text-align: center;"><#BlockedClient#></th>
+            <th colspan="5" style="text-align: center;"><#BlockedClient#></th>
         </tr>
         <tr>
             <th colspan="1"><#Type#></th>
-            <th colspan="4" id="col_unhname"><#Computer_Name#></th>
+            <th id="col_unhname" colspan="1"><#Computer_Name#></th>
             <th colspan="1"><#LAN_IP#></th>
             <th colspan="1"><#MAC_Address#></th>
-            <th colspan="1" id="col_unblock"></th>
+            <th id="col_unblock" colspan="1"></th>
         </tr>
     </thead>
     <tbody>
@@ -425,8 +426,8 @@ function networkmap_update(s){
 <script>
 	if (sw_mode != "3") {
 		if (list_type != "1"){
-			$("col_hname").colspan = "4";
-			$("col_unhname").colspan = "4";
+			$("col_hname").colspan = "1";
+			$("col_unhname").colspan = "1";
 			$("col_block").innerHTML = "<#Block#>";
 			$("col_unblock").innerHTML = "<#unBlock#>";
 		}
